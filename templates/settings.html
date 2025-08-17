@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Voice Assistant - Settings{% endblock %}
+
+{% block content %}
+<style>
+    .card, .card-body, .card-header, h3, h4, p, .text-muted {
+        color: rgba(0, 0, 0, 0.692) !important;
+    }
+</style>
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header">
+                <h3>Webcam Test</h3>
+            </div>
+            <div class="card-body">
+                <div class="video-container">
+                    <video id="settingsWebcam" autoplay playsinline muted style="width: 100%; border-radius: 8px; display:none;"></video>
+                    <div id="settingsNoCamera" class="text-muted text-center">
+                        <p>Webcam not active</p>
+                        <button class="btn btn-outline-dark" onclick="initSettingsWebcam()">Enable Webcam</button>
+                    </div>
+                </div>
+                <div class="mt-3 d-flex gap-2">
+                    <button class="btn btn-outline-dark" onclick="captureTestFrame()">Capture Test Frame (for OCR)</button>
+                </div>
+                <canvas id="settingsCanvas" width="640" height="480" style="display:none;"></canvas>
+                <div id="status" class="mt-3"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card mt-4">
+            <div class="card-header">
+                <h4>Quick Actions</h4>
+            </div>
+            <div class="card-body">
+                <a href="/" class="btn btn-outline-dark">Back to Home</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function initSettingsWebcam() {
+    const video = document.getElementById('settingsWebcam');
+    const placeholder = document.getElementById('settingsNoCamera');
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        showStatus('Your browser does not support webcam access.', true);
+        return;
+    }
+    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+        .then(stream => {
+            video.srcObject = stream;
+            video.onloadedmetadata = () => {
+                video.play();
+                video.style.display = 'block';
+                placeholder.style.display = 'none';
+            };
+        })
+        .catch(err => {
+            console.error('Webcam error:', err);
+            showStatus('Unable to access webcam. Please allow camera permission.', true);
+        });
+}
+
+// toggleWebcamMute removed
+
+function captureTestFrame() {
+    const video = document.getElementById('settingsWebcam');
+    if (!video || video.style.display === 'none') {
+        showStatus('Start the webcam first.', true);
+        return;
+    }
+    const canvas = document.getElementById('settingsCanvas');
+    const ctx = canvas.getContext('2d');
+    const w = video.videoWidth || 640;
+    const h = video.videoHeight || 480;
+    canvas.width = w;
+    canvas.height = h;
+    ctx.drawImage(video, 0, 0, w, h);
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+    showStatus('Captured a frame. You can now go to Home and use Read Text.');
+}
+
+// Voice test removed
+</script>
+{% endblock %}

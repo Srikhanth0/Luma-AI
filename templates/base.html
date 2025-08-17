@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}LUMA - Accessibility Assistant{% endblock %}</title>
+    <meta name="theme-color" content="#0f172a">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="icon" type="image/png" href="/static/LUMA.png">
+    <link rel="apple-touch-icon" href="/static/LUMA.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6d28d9; /* purple */
+            --secondary-color: #ef4444; /* pink/orange end */
+            --accent-color: #f97316; /* orange */
+            --dark-bg: #0f172a;
+            --card-bg: rgba(255,255,255,0.35);
+            --border-color: rgba(0,0,0,0.08);
+            --text-primary: #0f172a;
+            --text-secondary: #111827;
+            --shadow: 0 12px 32px rgba(0,0,0,0.15);
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: radial-gradient(1200px 800px at 50% 0%, #ffffff 0%, #e7e7ea 55%, #c6c6cb 100%);
+            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        .gradient-text {
+            background: linear-gradient(90deg, #5b6cff 0%, #b833ff 40%, #ff3d77 70%, #ff8a3d 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .btn {
+            font-size: 18px;
+            font-weight: 500;
+            padding: 16px 32px;
+            margin: 8px;
+            border-radius: 16px;
+            border: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow);
+            text-transform: none;
+            letter-spacing: 0.025em;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #6366f1 100%);
+            color: rgb(82, 81, 81);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #4338ca 0%, var(--primary-color) 100%);
+            color: white;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: linear-gradient(135deg, #047857 0%, var(--success-color) 100%);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning-color) 0%, #d97706 100%);
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background: linear-gradient(135deg, #b45309 0%, var(--warning-color) 100%);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger-color) 0%, #dc2626 100%);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #b91c1c 0%, var(--danger-color) 100%);
+            color: white;
+        }
+        
+        .btn-lg {
+            font-size: 20px;
+            padding: 20px 40px;
+        }
+        .form-control {
+            font-size: 18px;
+            padding: 16px 20px;
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-control:focus {
+            background-color: var(--card-bg);
+            border-color: var(--primary-color);
+            color: var(--text-primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1), inset 0 2px 4px rgba(0, 0, 0, 0.1);
+            outline: none;
+        }
+        
+        .form-control::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.8;
+        }
+        
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            margin: 24px 0;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%);
+            border-bottom: 1px solid var(--border-color);
+            padding: 20px 24px;
+            font-weight: 600;
+        }
+        
+        .card-body {
+            padding: 24px;
+        }
+        .navbar { background: transparent !important; padding: 16px 0; }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 24px;
+            color: var(--text-primary) !important;
+        }
+        
+        .nav-link {
+            color: var(--text-secondary) !important;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+        
+        .status-message {
+            font-size: 16px;
+            padding: 16px 20px;
+            margin: 16px 0;
+            border-radius: 12px;
+            border-left: 4px solid;
+            font-weight: 500;
+        }
+
+        /* Accessibility: ensure all muted/secondary text appears white for visibility */
+        .text-muted { color: #ffffff !important; opacity: 1 !important; }
+        .text-secondary { color: #ffffff !important; }
+        
+        .status-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border-left-color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+        
+        .status-error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border-left-color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+        .video-container {
+            text-align: center;
+            margin: 24px 0;
+            position: relative;
+        }
+        
+        #videoFeed {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+        
+        #videoFeed:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1), var(--shadow);
+        }
+        
+        .accessibility-focus {
+            outline: 3px solid var(--primary-color) !important;
+            outline-offset: 3px;
+            border-radius: 16px;
+        }
+        
+        .permission-banner {
+            background: linear-gradient(135deg, var(--warning-color) 0%, #d97706 100%);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            margin: 16px 0;
+            text-align: center;
+            font-weight: 500;
+            box-shadow: var(--shadow);
+        }
+        
+        .permission-banner button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 500;
+            margin: 0 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .permission-banner button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/">Home</a>
+                <a class="nav-link" href="/settings">Settings</a>
+                <button id="installBtn" class="btn btn-outline-dark btn-sm ms-3" style="display:none;">
+                    <i class="fas fa-download me-1"></i> Install App
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% block content %}{% endblock %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='voice_capture.js') }}"></script>
+    <script>
+        // Register service worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(err => console.warn('SW registration failed', err));
+            });
+        }
+
+        // PWA install prompt handling
+        let deferredPrompt = null;
+        const installBtn = document.getElementById('installBtn');
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            if (installBtn) installBtn.style.display = 'inline-block';
+        });
+
+        if (installBtn) {
+            installBtn.addEventListener('click', async () => {
+                if (!deferredPrompt) return;
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    showStatus('App installed. You can launch it from your apps.', false);
+                    installBtn.style.display = 'none';
+                }
+                deferredPrompt = null;
+            });
+        }
+
+        // Global permission states
+        let microphonePermission = false;
+        let audioPermission = false;
+        let permissionsBanner = null;
+        
+        // Check and request permissions
+        async function checkPermissions() {
+            try {
+                // Check microphone permission
+                const micResult = await navigator.permissions.query({name: 'microphone'});
+                microphonePermission = micResult.state === 'granted';
+                
+                // Check if we can play audio (no explicit permission needed, but we test it)
+                audioPermission = true; // Audio playback is generally allowed
+                
+                if (!microphonePermission) {
+                    showPermissionBanner();
+                }
+                
+                return microphonePermission && audioPermission;
+            } catch (error) {
+                console.log('Permission API not supported, will request on first use');
+                return false;
+            }
+        }
+        
+        function showPermissionBanner() {
+            if (permissionsBanner) return;
+            
+            permissionsBanner = document.createElement('div');
+            permissionsBanner.className = 'permission-banner';
+            permissionsBanner.innerHTML = `
+                <div>
+                    <i class="fas fa-microphone-slash me-2"></i>
+                    <strong>Microphone Access Required</strong>
+                    <p class="mb-2 mt-2">This app needs microphone access for voice commands and audio output permissions for speech feedback.</p>
+                    <button onclick="requestPermissions()" class="me-2">
+                        <i class="fas fa-microphone me-1"></i> Enable Microphone
+                    </button>
+                    <button onclick="dismissBanner()">
+                        <i class="fas fa-times me-1"></i> Dismiss
+                    </button>
+                </div>
+            `;
+            
+            const container = document.querySelector('.container');
+            if (container) {
+                container.insertBefore(permissionsBanner, container.firstChild);
+            }
+        }
+        
+        async function requestPermissions() {
+            try {
+                // Request microphone permission
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                microphonePermission = true;
+                
+                // Test audio playback
+                const audio = new Audio();
+                audio.volume = 0.1;
+                audioPermission = true;
+                
+                // Stop the microphone stream
+                stream.getTracks().forEach(track => track.stop());
+                
+                dismissBanner();
+                showStatus(' Permissions granted! You can now use voice commands.', false);
+                
+                // Speak confirmation
+                makeApiCall('/api/speak', {text: 'Microphone and audio permissions granted. You can now use voice commands.'});
+                
+                // Notify pages that permissions are granted (for auto-starting wake word, etc.)
+                try {
+                    window.dispatchEvent(new CustomEvent('permissions-granted', {
+                        detail: { microphone: true, audio: true }
+                    }));
+                } catch (e) {
+                    console.warn('Could not dispatch permissions-granted event', e);
+                }
+                
+            } catch (error) {
+                console.error('Permission denied:', error);
+                showStatus(' Microphone permission denied. Voice features will be limited.', true);
+            }
+        }
+        
+        function dismissBanner() {
+            if (permissionsBanner) {
+                permissionsBanner.remove();
+                permissionsBanner = null;
+            }
+        }
+
+        // Button loading state functions
+        function showButtonLoading(buttonId) {
+            const btn = document.getElementById(buttonId);
+            if (btn) {
+                btn.disabled = true;
+                const originalText = btn.innerHTML;
+                btn.setAttribute('data-original-text', originalText);
+                btn.innerHTML = '<span class="loading-spinner"></span> Processing...';
+            }
+        }
+
+        function hideButtonLoading(buttonId) {
+            const btn = document.getElementById(buttonId);
+            if (btn) {
+                btn.disabled = false;
+                const originalText = btn.getAttribute('data-original-text');
+                if (originalText) {
+                    btn.innerHTML = originalText;
+                    btn.removeAttribute('data-original-text');
+                }
+            }
+        }
+        
+        // Accessibility enhancements
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check permissions on load
+            checkPermissions();
+            
+            // Add keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Tab') {
+                    document.querySelectorAll('.btn, .form-control').forEach(el => {
+                        el.addEventListener('focus', function() {
+                            this.classList.add('accessibility-focus');
+                        });
+                        el.addEventListener('blur', function() {
+                            this.classList.remove('accessibility-focus');
+                        });
+                    });
+                }
+            });
+
+            // Add ARIA labels and roles
+            document.querySelectorAll('.btn').forEach(btn => {
+                if (!btn.getAttribute('aria-label')) {
+                    btn.setAttribute('aria-label', btn.textContent.trim());
+                }
+            });
+        });
+
+        // Global functions for API calls
+        function showStatus(message, isError = false) {
+            const statusDiv = document.getElementById('status');
+            if (statusDiv) {
+                statusDiv.innerHTML = `<div class="status-message ${isError ? 'status-error' : 'status-success'}">${message}</div>`;
+                setTimeout(() => {
+                    statusDiv.innerHTML = '';
+                }, 5000);
+            }
+        }
+
+        async function makeApiCall(url, data, successCallback, errorCallback) {
+            try {
+                // Plain JSON POST (no auth headers)
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                // Handle non-2xx HTTP statuses gracefully
+                let payload = null;
+                try {
+                    payload = await response.json();
+                } catch (e) {
+                    // If backend didn't return JSON
+                    if (!response.ok) {
+                        const msg = `HTTP ${response.status} ${response.statusText}`;
+                        if (errorCallback) errorCallback(msg);
+                        return;
+                    }
+                }
+
+                if (!response.ok) {
+                    const msg = (payload && (payload.message || payload.error)) || `HTTP ${response.status}`;
+                    if (errorCallback) errorCallback(msg);
+                    return;
+                }
+
+                if (payload && payload.success) {
+                    if (successCallback) successCallback(payload);
+                } else {
+                    const msg = (payload && (payload.message || payload.error)) || 'Unknown error';
+                    if (errorCallback) errorCallback(msg);
+                }
+            } catch (error) {
+                console.error('Network error:', error);
+                if (errorCallback) errorCallback('Network error occurred');
+            }
+        }
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

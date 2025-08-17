@@ -1,0 +1,1136 @@
+{% extends "base.html" %}
+
+{% block title %}Voice Assistant - Home{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    </div>
+  </header>
+  <div class="container mt-4">
+    <style>
+      .hero-logo { letter-spacing:6px; text-shadow: 0 6px 20px rgba(0,0,0,0.12);} 
+      .glass-card { background: rgba(255,255,255,0.35); border: 1px solid rgba(0,0,0,0.06); border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.15);} 
+      .big-icon { width: 84px; height: 84px; }
+      .cta-card { width: 280px; height: 220px; display:flex; align-items:center; justify-content:center; flex-direction:column; }
+      .mic-btn { width: 120px; height: 120px; border-radius: 60px; border: none; background: transparent; position: relative; }
+      .mic-btn .ring { position:absolute; inset:-10px; border-radius:999px; border:2px solid rgba(91,108,255,0.35); animation:pulseRing 2s ease-out infinite; }
+      .mic-btn.listening::after { content:""; position:absolute; inset:-16px; border-radius:999px; border:3px solid rgba(255,86,86,0.6); animation:pulseRing 1.6s ease-out infinite; }
+      @keyframes pulseRing { 0%{ transform: scale(0.9); opacity: 0.9;} 100%{ transform: scale(1.2); opacity:0;} }
+      /* Small camera preview styling */
+      .video-container video { width: 320px; max-width: 100%; height: auto; border-radius: 12px; }
+      .muted-grey { color: #6b7280 !important; }
+    </style>
+
+    <div class="d-flex flex-column align-items-center text-center my-3">
+      <img src="/Assets/LUMA.svg" alt="LUMA" class="hero-logo-img mb-3" style="height: 120px; width: auto;">
+      <p class="lead muted-grey" style="font-family: 'Inter', sans-serif;">
+        Luma your destination for accessability
+      </p>
+    </div>
+
+    <div class="d-flex flex-column align-items-center gap-4 my-4">
+      <!-- Camera access card -->
+      <div class="glass-card cta-card">
+        <svg class="big-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#5b6cff"/>
+              <stop offset="60%" stop-color="#b833ff"/>
+              <stop offset="100%" stop-color="#ff6a3d"/>
+            </linearGradient>
+          </defs>
+          <path d="M12 7a5 5 0 100 10 5 5 0 000-10zm0-4l1.9 3.2H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h5.1L12 3z" fill="url(#grad1)"/>
+        </svg>
+        <button id="cameraAccessBtn" class="btn btn-light mt-3" onclick="enableWebcam()">Access your camera</button>
+      </div>
+
+      <!-- Mic control -->
+      <button id="micBtn" class="mic-btn" onclick="toggleMic()" aria-label="Toggle microphone">
+        <span class="ring"></span>
+        <svg class="big-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#5b6cff"/>
+              <stop offset="60%" stop-color="#b833ff"/>
+              <stop offset="100%" stop-color="#ff6a3d"/>
+            </linearGradient>
+          </defs>
+          <path d="M12 14a3 3 0 003-3V7a3 3 0 10-6 0v4a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 0014 0h-2z" fill="url(#grad2)"/>
+        </svg>
+      </button>
+
+      <div id="status" class="mt-1"></div>
+      <small id="wakeDebug" class="text-muted"></small>
+      <span id="wakeStatus" class="badge bg-secondary" style="display:none">Wake word off</span>
+    </div>
+
+    <!-- Camera Preview -->
+    <div id="cameraSection" class="row justify-content-center mt-2" style="display:none;"> <!-- hidden by default; shown after enabling camera -->
+      <div class="col-md-10">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0 muted-grey">Camera Preview</h4>
+            <div>
+              <button id="enableCamBtn" class="btn btn-success btn-sm" onclick="enableWebcam()">
+                <i class="fas fa-camera"></i> Enable Webcam
+              </button>
+              <button id="disableCamBtn" class="btn btn-outline-danger btn-sm" onclick="disableWebcam()" style="display:none;">
+                <i class="fas fa-ban"></i> Disable
+              </button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="video-container">
+              <video id="videoFeed" autoplay playsinline muted></video>
+            </div>
+            <small class="muted-grey">Tip: Point the camera at signs, documents, or labels and press Read Text.</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row justify-content-center mt-4">
+      <div class="col-md-10">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Conversation</h4>
+            <button id="clearRagBtn" class="btn btn-outline-secondary btn-sm" onclick="clearMemory()">Clear Memory</button>
+          </div>
+          <div class="card-body">
+            <div id="conversationLog" style="height: 300px; overflow-y: auto; background-color: #1a1a1a; padding: 15px; border-radius: 8px;">
+              <p class="text-muted">Say "Liya" and then ask a question...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Camera preview helpers (moved into scripts block)
+let mediaStream = null;
+let cameraConnected = false;
+
+// Clear RAG memory via backend endpoint (placed inside scripts block)
+function clearMemory() {
+    showStatus('Clearing memory...');
+    makeApiCall('/api/rag/clear', {},
+        function(resp) {
+            // Clear conversation log
+            conversationLog = [];
+            updateConversationLog();
+            showStatus('Memory and conversation cleared');
+            try { speakText('Memory and conversation cleared.'); } catch {}
+        },
+        function(err) {
+            showStatus('Failed to clear memory: ' + err, true);
+            try { speakText('Failed to clear memory.'); } catch {}
+        }
+    );
+}
+
+async function enableWebcam() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        showStatus('Webcam not supported in this browser.', true);
+        return;
+    }
+    try {
+        mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false });
+        const video = document.getElementById('videoFeed');
+        video.srcObject = mediaStream;
+        await video.play().catch(()=>{});
+        cameraConnected = true;
+        // Show small camera preview section
+        try { document.getElementById('cameraSection').style.display = 'block'; } catch {}
+        document.getElementById('enableCamBtn').style.display = 'none';
+        document.getElementById('disableCamBtn').style.display = 'inline-block';
+        showStatus('Webcam enabled');
+        // Dispatch permissions-granted for wake auto-start
+        try { window.dispatchEvent(new Event('permissions-granted')); } catch {}
+    } catch (e) {
+        console.warn('getUserMedia error', e);
+        showStatus('Failed to access webcam: ' + (e && e.message ? e.message : e), true);
+    }
+}
+
+function disableWebcam() {
+    try {
+        const video = document.getElementById('videoFeed');
+        if (mediaStream) {
+            mediaStream.getTracks().forEach(t => { try { t.stop(); } catch {} });
+        }
+        mediaStream = null;
+        video.srcObject = null;
+        cameraConnected = false;
+        // Hide camera preview section
+        try { document.getElementById('cameraSection').style.display = 'none'; } catch {}
+        document.getElementById('enableCamBtn').style.display = 'inline-block';
+        document.getElementById('disableCamBtn').style.display = 'none';
+        showStatus('Webcam disabled');
+    } catch (e) { console.warn('disableWebcam error', e); }
+}
+
+function captureFrameDataUrl() {
+    const video = document.getElementById('videoFeed');
+    const w = video.videoWidth || 640;
+    const h = video.videoHeight || 480;
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, w, h);
+    return canvas.toDataURL('image/png');
+}
+
+// Minimal voice assistant - wake word and AI responses only
+let conversationLog = [];
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    updateConversationLog();
+});
+
+// Conversation log functions
+function addToConversation(speaker, message, timestamp = new Date()) {
+    conversationLog.push({
+        speaker: speaker,
+        message: message,
+        timestamp: timestamp
+    });
+    updateConversationLog();
+}
+
+function updateConversationLog() {
+    const logDiv = document.getElementById('conversationLog');
+    if (conversationLog.length === 0) {
+        logDiv.innerHTML = '<p class="text-muted">Say "Hey Liya" and then ask a question...</p>';
+        return;
+    }
+    
+    let html = '';
+    conversationLog.slice(-10).forEach(entry => {
+        const time = entry.timestamp.toLocaleTimeString();
+        const speakerIcon = entry.speaker === 'You' ? '' : '';
+        html += `<div class="mb-2">
+            <small class="text-muted">${time}</small><br>
+            <strong>${speakerIcon} ${entry.speaker}:</strong> ${entry.message}
+        </div>`;
+    });
+    logDiv.innerHTML = html;
+    logDiv.scrollTop = logDiv.scrollHeight;
+}
+
+// Status display
+function showStatus(message, isError = false) {
+    const statusDiv = document.getElementById('status');
+    if (statusDiv) {
+        statusDiv.innerHTML = `<div class="alert ${isError ? 'alert-danger' : 'alert-info'} alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>`;
+    }
+}
+
+// Text-to-speech (robust, chunked to avoid cut-offs)
+let ttsQueue = [];
+let ttsIsSpeaking = false;
+let resumeWakeAfterTts = false;
+let ttsResumeInterval = null;
+let ttsWatchdogInterval = null;
+let ttsLastBoundaryTs = 0;
+let ttsPreferredVoice = null; // chosen voice for consistency
+let ttsAudio = null; // HTMLAudioElement for backend TTS
+let ttsNextText = null; // queue next requested text if busy
+let ttsNetChunks = [];
+let ttsNetIndex = 0;
+// TTS mode: 'network' (MP3 via backend) or 'browser' (Web Speech). Persist in localStorage.
+window.useBrowserTTS = (localStorage.getItem('ttsMode') === 'browser');
+
+function loadVoicesAsync(timeoutMs = 3000) {
+    return new Promise((resolve) => {
+        const voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+        if (voices && voices.length) return resolve(voices);
+        let done = false;
+        const onVoices = () => {
+            if (done) return; done = true;
+            try { window.speechSynthesis.removeEventListener('voiceschanged', onVoices); } catch {}
+            resolve(window.speechSynthesis.getVoices() || []);
+        };
+        try { window.speechSynthesis.addEventListener('voiceschanged', onVoices); } catch {}
+        setTimeout(() => { if (!done) { done = true; resolve(window.speechSynthesis.getVoices() || []); } }, timeoutMs);
+    });
+}
+
+function choosePreferredVoice(voices) {
+    if (!voices || !voices.length) return null;
+    // Priority list for female voices first
+    const preferred = [
+        'Google UK English Female',
+        'Microsoft Aria Online (Natural) - English (United States)',
+        'Microsoft Zira Desktop - English (United States)',
+        'Google US English Female',
+        'Samantha',
+        'Alex',
+        'Google US English',
+        'Google UK English Male',
+        'Microsoft Guy Online (Natural) - English (United States)'
+    ];
+    for (const p of preferred) {
+        const v = voices.find(v => (v && v.name && v.name.toLowerCase().includes(p.toLowerCase())));
+        if (v) return v;
+    }
+    // Fallback: prefer female voices
+    let v = voices.find(v => v && (v.name || '').toLowerCase().includes('female'));
+    if (v) return v;
+    // Then any en-US, then any en*
+    v = voices.find(v => v && (v.lang || '').toLowerCase() === 'en-us');
+    if (v) return v;
+    v = voices.find(v => v && (v.lang || '').toLowerCase().startsWith('en'));
+    return v || voices[0];
+}
+
+function splitIntoChunks(text, maxLen = 300) {
+    // Increase chunk size for better text reading flow
+    const sentences = (text || '').match(/[^.!?\n]+[.!?\n]?/g) || [text];
+    const chunks = [];
+    let buf = '';
+    for (const s of sentences) {
+        if ((buf + s).length <= maxLen) {
+            buf += s;
+        } else {
+            if (buf) chunks.push(buf.trim());
+            if (s.length <= maxLen) {
+                buf = s;
+            } else {
+                // Hard split long sentences at word boundaries
+                const words = s.split(' ');
+                let currentChunk = '';
+                for (const word of words) {
+                    if ((currentChunk + ' ' + word).length <= maxLen) {
+                        currentChunk += (currentChunk ? ' ' : '') + word;
+                    } else {
+                        if (currentChunk) chunks.push(currentChunk.trim());
+                        currentChunk = word;
+                    }
+                }
+                if (currentChunk) chunks.push(currentChunk.trim());
+                buf = '';
+            }
+        }
+    }
+    if (buf.trim()) chunks.push(buf.trim());
+    return chunks.filter(Boolean);
+}
+
+async function speakText(text) {
+    if (!('speechSynthesis' in window)) return;
+    try {
+        // If already speaking (audio or Web Speech), queue and return
+        if ((ttsAudio && !ttsAudio.ended && !ttsAudio.paused) || ttsIsSpeaking) {
+            ttsNextText = text;
+            return;
+        }
+        // Stop any in-progress speech and audio
+        try { window.speechSynthesis.cancel(); } catch {}
+        try { if (ttsAudio) { ttsAudio.pause(); ttsAudio.src = ''; ttsAudio = null; } } catch {}
+
+        // Choose engine by toggle
+        if (!window.useBrowserTTS) {
+            const usedNetwork = await tryNetworkTts(text);
+            if (usedNetwork) return;
+        }
+
+        // Fallback to Web Speech API (chunked)
+        ttsQueue = splitIntoChunks(text);
+        if (!ttsQueue.length) return;
+
+        // Ensure we have a consistent, high-quality voice selected
+        try {
+            const voices = await loadVoicesAsync();
+            ttsPreferredVoice = choosePreferredVoice(voices);
+        } catch {}
+
+        // Pause wake word while speaking, resume afterwards
+        try {
+            if (typeof wakeActive !== 'undefined' && wakeActive) {
+                resumeWakeAfterTts = true;
+                stopWakeWord();
+            } else {
+                resumeWakeAfterTts = false;
+            }
+        } catch {}
+
+        ttsIsSpeaking = true;
+        // Chrome sometimes pauses TTS; ping resume
+        try {
+            if (ttsResumeInterval) clearInterval(ttsResumeInterval);
+            ttsResumeInterval = setInterval(() => {
+                try { if (window.speechSynthesis.paused) window.speechSynthesis.resume(); } catch {}
+            }, 500);
+        } catch {}
+        playNextTtsChunk();
+    } catch (e) {
+        console.warn('Speech synthesis error:', e);
+    }
+}
+
+function playNextTtsChunk() {
+    if (!ttsQueue.length) {
+        // Done
+        ttsIsSpeaking = false;
+        if (ttsResumeInterval) {
+            try { clearInterval(ttsResumeInterval); } catch {}
+            ttsResumeInterval = null;
+        }
+        if (ttsWatchdogInterval) {
+            try { clearInterval(ttsWatchdogInterval); } catch {}
+            ttsWatchdogInterval = null;
+        }
+        try {
+            if (resumeWakeAfterTts && typeof wakeActive !== 'undefined' && !wakeActive) {
+                setTimeout(() => { try { startWakeWord(); } catch {} }, 800);
+            }
+        } catch {}
+        resumeWakeAfterTts = false;
+        // If next text is queued, speak it now
+        if (ttsNextText) { const next = ttsNextText; ttsNextText = null; speakText(next); }
+        return;
+    }
+    const chunk = ttsQueue.shift();
+    const utter = new SpeechSynthesisUtterance(chunk);
+    if (ttsPreferredVoice) {
+        try { utter.voice = ttsPreferredVoice; } catch {}
+    }
+    utter.rate = 0.95;
+    utter.pitch = 1.0;
+    utter.volume = 1.0;
+    ttsLastBoundaryTs = Date.now();
+    utter.onboundary = () => { ttsLastBoundaryTs = Date.now(); };
+    utter.onend = () => {
+        // Small delay to avoid clipping next chunk
+        setTimeout(playNextTtsChunk, 80);
+    };
+    utter.onerror = (e) => {
+        console.warn('TTS utterance error:', e);
+        // Try next chunk anyway
+        setTimeout(playNextTtsChunk, 80);
+    };
+    utter.onpause = () => {
+        try { window.speechSynthesis.resume(); } catch {}
+    };
+    // Watchdog: if no boundary for a while, try resuming
+    try {
+        if (ttsWatchdogInterval) clearInterval(ttsWatchdogInterval);
+        ttsWatchdogInterval = setInterval(() => {
+            const elapsed = Date.now() - ttsLastBoundaryTs;
+            if (elapsed > 4000) {
+                try { window.speechSynthesis.resume(); } catch {}
+                ttsLastBoundaryTs = Date.now();
+            }
+        }, 1000);
+    } catch {}
+    try { window.speechSynthesis.speak(utter); } catch (e) { console.warn('speak error', e); setTimeout(playNextTtsChunk, 80); }
+}
+
+async function tryNetworkTts(text) {
+    try {
+        // Pause wake word during playback
+        try {
+            if (typeof wakeActive !== 'undefined' && wakeActive) {
+                resumeWakeAfterTts = true;
+                stopWakeWord();
+            } else {
+                resumeWakeAfterTts = false;
+            }
+        } catch {}
+
+        // Split very long text into manageable chunks for TTS
+        const chunks = splitTextForNetworkTts(text, 700);
+        ttsNetChunks = chunks;
+        ttsNetIndex = 0;
+        if (!ttsAudio) ttsAudio = new Audio();
+        // Robust handlers
+        ttsAudio.onended = async () => {
+            try { if (ttsAudio && ttsAudio.src) URL.revokeObjectURL(ttsAudio.src); } catch {}
+            // Next chunk or finish
+            if (ttsNetIndex < ttsNetChunks.length) {
+                await fetchAndPlayNetworkChunk(ttsNetChunks[ttsNetIndex++]);
+            } else {
+                // Finished all chunks
+                try {
+                    if (resumeWakeAfterTts && typeof wakeActive !== 'undefined' && !wakeActive) {
+                        setTimeout(() => { try { startWakeWord(); } catch {} }, 800);
+                    }
+                } catch {}
+                resumeWakeAfterTts = false;
+                // If next text is queued, speak it now
+                if (ttsNextText) {
+                    const next = ttsNextText; ttsNextText = null; speakText(next);
+                }
+            }
+        };
+        ttsAudio.onpause = async () => {
+            // Auto-resume if not ended
+            try { if (ttsAudio && !ttsAudio.ended) await ttsAudio.play(); } catch {}
+        };
+        ttsAudio.onstalled = ttsAudio.onwaiting = async () => {
+            try { if (ttsAudio && !ttsAudio.ended) await ttsAudio.play(); } catch {}
+        };
+        ttsAudio.onerror = (e) => { console.warn('Audio playback error', e); };
+
+        // Start first chunk
+        await fetchAndPlayNetworkChunk(ttsNetChunks[ttsNetIndex++]);
+        return true;
+    } catch (e) {
+        console.warn('Network TTS failed, falling back to Web Speech:', e);
+        return false;
+    }
+}
+
+function splitTextForNetworkTts(text, maxLen = 1000) {
+    const sentences = (text || '').match(/[^.!?\n]+[.!?\n]?/g) || [text];
+    const out = [];
+    let buf = '';
+    for (const s of sentences) {
+        if ((buf + s).length <= maxLen) buf += s; else {
+            if (buf) out.push(buf.trim());
+            if (s.length <= maxLen) buf = s; else {
+                for (let i = 0; i < s.length; i += maxLen) out.push(s.slice(i, i+maxLen).trim());
+                buf = '';
+            }
+        }
+    }
+    if (buf.trim()) out.push(buf.trim());
+    return out.filter(Boolean);
+}
+
+async function fetchAndPlayNetworkChunk(chunkText) {
+    const resp = await fetch('/api/speak', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: chunkText })
+    });
+    if (!resp.ok) throw new Error('TTS API failed');
+    const blob = await resp.blob();
+    if (!blob || blob.size === 0) throw new Error('Empty audio');
+    const url = URL.createObjectURL(blob);
+    ttsAudio.src = url;
+    await ttsAudio.play();
+}
+
+// If tab becomes hidden, some engines pause TTS; resume on visibility
+try {
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+            try { if (window.speechSynthesis.paused) window.speechSynthesis.resume(); } catch {}
+        }
+    });
+} catch {}
+
+// Voice command processing
+function processVoiceCommand(command) {
+    console.log('[DEBUG] processVoiceCommand called with:', command);
+    const lowerCommand = command.toLowerCase();
+    const stripped = lowerCommand.replace(/^hey\s+liya[\s,]*/,'').replace(/^liya[\s,]*/, '');
+    console.log('[DEBUG] Stripped command:', stripped);
+
+    if (false) { // OCR functionality removed
+        if (!cameraConnected) {
+            showStatus('Enabling camera to capture text...');
+            enableWebcam().then(() => setTimeout(() => readText(), 400)).catch(() => readText());
+        } else {
+            readText();
+        }
+        return;
+    }
+
+    // Default: send as a question to AI
+    showStatus('Thinking...');
+    console.log('[DEBUG] Making API call to /api/ask with question:', stripped || command);
+    makeApiCall('/api/ask', {question: stripped || command},
+        function(response) {
+            let ans = response && response.answer ? response.answer : '';
+            if (!ans) {
+                const msg = (response && response.message) ? response.message : 'AI did not return a response. Please try again in a moment.';
+                addToConversation('Assistant', msg);
+                showStatus(' ' + msg, true);
+                speakText(msg);
+                return;
+            }
+            console.log('[DEBUG] Got AI answer:', ans);
+            addToConversation('Assistant', ans);
+            showStatus('Response received');
+            speakText(ans);
+        },
+        function(error) {
+            console.log('[DEBUG] API error:', error);
+            const msg = 'Error: ' + error;
+            showStatus(msg, true);
+            speakText(msg);
+        }
+    );
+}
+
+// startListening removed - using wake word only
+
+// Focused listening started by wake word confirmation
+function startListening() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        showStatus('Speech recognition not supported in this browser.', true);
+        return;
+    }
+
+    // Do not cancel the short confirmation ('Yes?') utterance
+    try {
+        if (!suppressTtsCancel && window.speechSynthesis && window.speechSynthesis.speaking) {
+            window.speechSynthesis.cancel();
+        }
+    } catch {}
+
+    showStatus('Listening');
+
+    const resumeWake = wakeActive;
+    if (wakeActive) stopWakeWord();
+
+    const rec = new SpeechRecognition();
+    rec.continuous = false;
+    rec.interimResults = false;
+    rec.lang = 'en-US';
+
+    rec.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        addToConversation('You', transcript);
+        // Use processVoiceCommand instead of directly calling API
+        processVoiceCommand(transcript);
+    };
+
+    rec.onerror = (e) => {
+        console.error('Recognition error', e);
+        showStatus('Speech recognition error. Try again.', true);
+    };
+
+    rec.onend = () => {
+        if (resumeWake && !wakeActive) startWakeWord();
+    };
+
+    try { rec.start(); } catch(e) { console.warn('startListening start error', e); }
+}
+function stopListening() {
+    isListening = false;
+    document.getElementById('listenBtn').style.display = 'block';
+    document.getElementById('stopBtn').style.display = 'none';
+    showStatus('Stopped listening');
+    try { currentRecognition && currentRecognition.stop && currentRecognition.stop(); } catch(e) {}
+    currentRecognition = null;
+}
+
+function askQuestion() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        showStatus('Speech recognition not supported in this browser.', true);
+        hideButtonLoading('askBtn');
+        return;
+    }
+    
+    // Stop any ongoing TTS to avoid masking the user's speech
+    try { if (window.speechSynthesis && window.speechSynthesis.speaking) window.speechSynthesis.cancel(); } catch {}
+    showStatus('Listening for your question...');
+    showButtonLoading('askBtn');
+    
+    const resumeWake = wakeActive;
+    if (wakeActive) stopWakeWord();
+    
+    currentRecognition = new SpeechRecognition();
+    currentRecognition.continuous = false;
+    currentRecognition.interimResults = false;
+    currentRecognition.lang = 'en-US';
+    
+    currentRecognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        addToConversation('You', transcript);
+        showStatus('Thinking...');
+        makeApiCall('/api/ask', {question: transcript},
+            function(response) {
+                let ans = response && response.answer ? response.answer : '';
+                if (!ans) {
+                    const msg = (response && response.message) ? response.message : 'AI did not return a response. Please try again in a moment.';
+                    addToConversation('Assistant', msg);
+                    showStatus('' + msg, true);
+                    hideButtonLoading('askBtn');
+                    speakText(msg);
+                    return;
+                }
+                addToConversation('Assistant', ans);
+                showStatus('Question answered');
+                hideButtonLoading('askBtn');
+                speakText(ans);
+            },
+            function(error) {
+                const msg = 'Error answering question: ' + error;
+                showStatus(msg, true);
+                hideButtonLoading('askBtn');
+                speakText(msg);
+            }
+        );
+    };
+    
+    currentRecognition.onerror = (e) => {
+        console.error('Recognition error', e);
+        showStatus('Speech recognition error. Try again.', true);
+        hideButtonLoading('askBtn');
+    };
+    
+    currentRecognition.onend = () => {
+        // Resume wake word if it was on before
+        if (resumeWake && !wakeActive) startWakeWord();
+    };
+    
+    try { currentRecognition.start(); } catch(e) { console.warn('askQuestion start error', e); }
+}
+
+function sendTextQuestion() {
+    const input = document.getElementById('textInput');
+    const question = input.value.trim();
+    if (!question) {
+        showStatus('Please enter a question first.', true);
+        return;
+    }
+    
+    // Clear the input
+    input.value = '';
+    
+    // Add to conversation and process
+    addToConversation('You', question);
+    showStatus('Thinking...');
+    
+    makeApiCall('/api/ask', {question: question},
+        function(response) {
+            let ans = response && response.answer ? response.answer : '';
+            if (!ans) {
+                const msg = (response && response.message) ? response.message : 'AI did not return a response. Please try again in a moment.';
+                addToConversation('Assistant', msg);
+                showStatus(' ' + msg, true);
+                speakText(msg);
+                return;
+            }
+            addToConversation('Assistant', ans);
+            showStatus('Question answered');
+            speakText(ans);
+        },
+        function(error) {
+            const msg = 'Error answering question: ' + error;
+            showStatus(msg, true);
+            speakText(msg);
+        }
+    );
+}
+
+function readText() {
+    console.log('[OCR] Starting text recognition...');
+    
+    // Show loading state for OCR button
+    showButtonLoading('ocrBtn');
+    
+    if (!cameraConnected) {
+        const errorMsg = 'Webcam not active. Click Enable Webcam first.';
+        console.error('[OCR] Error:', errorMsg);
+        showStatus(errorMsg, true);
+        hideButtonLoading('ocrBtn');
+        return;
+    }
+    
+    showStatus('Capturing image and reading text...');
+    try {
+        const dataUrl = captureFrameDataUrl();
+        if (!dataUrl || !dataUrl.startsWith('data:image/')) {
+            throw new Error('Failed to capture image from webcam');
+        }
+        
+        console.log('[OCR] Sending image for processing...');
+        makeApiCall('/api/ocr', { image_base64: dataUrl },
+            function(data) {
+                console.log('[OCR] Response received:', data);
+                if (data && data.text) {
+                    const displayText = data.text.trim();
+                    console.log('[OCR] Extracted text:', displayText);
+                    addToConversation('Assistant', `I can see: "${displayText}"`);
+                    showStatus('Text read successfully');
+                    speakText(`I can see the following text: ${displayText}`);
+                } else {
+                    const errorMsg = data && data.message ? data.message : 'No text could be recognized';
+                    console.warn('[OCR] No text found:', errorMsg);
+                    showStatus(errorMsg, true);
+                    speakText('I could not find any text in the image.');
+                }
+                hideButtonLoading('ocrBtn');
+            },
+            function(error) {
+                const errorMsg = error || 'Unknown error occurred';
+                console.error('[OCR] API Error:', errorMsg);
+                showStatus('Error reading text: ' + errorMsg, true);
+                speakText('Sorry, I encountered an error while trying to read the text.');
+                hideButtonLoading('ocrBtn');
+            }
+        );
+    } catch (error) {
+        const errorMsg = error.message || 'Failed to process image';
+        console.error('[OCR] Processing Error:', error);
+        showStatus('Error: ' + errorMsg, true);
+        speakText('Sorry, I could not process the image.');
+        hideButtonLoading('ocrBtn');
+    }
+}
+
+
+// Wake word detection using Web Speech API (passive listener)
+let wakeRecognition = null;
+let wakeActive = false;
+let lastWakeTriggerAt = 0;
+let wakeWatchdog = null; // restarts listener if it stalls
+let wakeRestarting = false; // guard to prevent overlapping restarts
+let wakeStarting = false; // guard to prevent double start()
+let suppressTtsCancel = false; // allow short confirmation ('Yes?') before starting listener
+
+// Mic toggle syncs with wake word state
+function toggleMic() {
+    try {
+        if (wakeActive) {
+            stopWakeWord();
+        } else {
+            startWakeWord();
+        }
+    } catch (e) { console.warn('toggleMic error', e); }
+}
+
+function setWakeDebug(msg) {
+    try {
+        const el = document.getElementById('wakeDebug');
+        if (el) el.textContent = msg || '';
+    } catch {}
+}
+
+function startWakeWord() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        showStatus('Wake word not supported in this browser.', true);
+        return;
+    }
+    if (wakeActive) return;
+    
+    wakeActive = true;
+    try {
+        const onBtn = document.getElementById('wakeEnableBtn');
+        const offBtn = document.getElementById('wakeDisableBtn');
+        if (onBtn) onBtn.style.display = 'none';
+        if (offBtn) offBtn.style.display = 'inline-block';
+    } catch {}
+    
+    try { 
+        const mic = document.getElementById('micBtn'); 
+        if (mic) mic.classList.add('listening'); 
+    } catch {}
+    
+    const badge = document.getElementById('wakeStatus');
+    if (badge) { 
+        badge.className = 'badge bg-success'; 
+        badge.textContent = 'Wake word on'; 
+    }
+    
+    // Initialize speech recognition with error handling
+    try {
+        if (!wakeRecognition) {
+            wakeRecognition = new SpeechRecognition();
+            wakeRecognition.continuous = true;
+            wakeRecognition.interimResults = false;
+            wakeRecognition.lang = 'en-US';
+            
+            wakeRecognition.onerror = function(event) {
+                console.error('Wake recognizer error', event);
+                if (event.error === 'not-allowed') {
+                    showStatus('Microphone access denied. Please allow microphone access to use voice commands.', true);
+                } else if (event.error === 'no-speech') {
+                    // This is normal when just starting up, don't show an error
+                    console.log('No speech detected yet');
+                } else {
+                    console.warn('Speech recognition error:', event.error);
+                }
+            };
+            
+            wakeRecognition.onresult = function(event) {
+                // Existing onresult handler
+                const transcript = Array.from(event.results)
+                    .map(result => result[0])
+                    .map(result => result.transcript)
+                    .join('');
+                
+                if (transcript.toLowerCase().includes('luma')) {
+                    // Handle wake word detection
+                    document.dispatchEvent(new Event('wake-word-detected'));
+                }
+            };
+            
+            wakeRecognition.onend = function() {
+                if (wakeActive) {
+                    wakeRecognition.start();
+                }
+            };
+        }
+        
+        // Start recognition
+        wakeRecognition.start();
+        
+    } catch (error) {
+        console.error('Error initializing speech recognition:', error);
+        showStatus('Error initializing voice commands: ' + error.message, true);
+        wakeActive = false;
+    }
+    setWakeDebug('Wake: starting…');
+
+    function normalize(text){
+        return (text || '').toLowerCase().replace(/[.,!?]/g,' ').replace(/\s+/g,' ').trim();
+    }
+
+    function isWakePhrase(text){
+        const t = normalize(text);
+        return t.includes('hey liya') || t === 'liya' || t.startsWith('liya ') || t.includes('okay liya');
+    }
+
+    // Watchdog helpers
+    function clearWakeWatchdog() {
+        if (wakeWatchdog) { clearTimeout(wakeWatchdog); wakeWatchdog = null; }
+    }
+    function armWakeWatchdog() {
+        clearWakeWatchdog();
+        // If nothing happens within 8s, restart recognizer
+        wakeWatchdog = setTimeout(() => {
+            if (!wakeActive) return;
+            if (wakeRestarting) return;
+            wakeRestarting = true;
+            try { wakeRecognition && wakeRecognition.abort && wakeRecognition.abort(); } catch {}
+            wakeRecognition = createRecognizer();
+            if (!wakeStarting) {
+                wakeStarting = true;
+                try { wakeRecognition.start(); } catch (e) { console.warn('Wake watchdog restart failed', e); } finally { /* onstart will clear wakeStarting */ }
+            }
+            wakeRestarting = false;
+        }, 8000);
+    }
+
+    const createRecognizer = () => {
+        const r = new SpeechRecognition();
+        r.lang = 'en-US';
+        r.interimResults = false;
+        r.continuous = true;
+        r.maxAlternatives = 1;
+        r.onstart = () => {
+            // Ensure no TTS is speaking while passive listener is active
+            try { if (window.speechSynthesis && window.speechSynthesis.speaking) window.speechSynthesis.cancel(); } catch {}
+            armWakeWatchdog();
+            wakeStarting = false;
+            setWakeDebug('Wake: listening…');
+        };
+        r.onresult = (e) => {
+            const res = e.results[e.results.length - 1];
+            const heardRaw = res && res[0] ? res[0].transcript : '';
+            const heard = normalize(heardRaw);
+            const now = Date.now();
+            armWakeWatchdog(); // got something; keep the watchdog alive
+            setWakeDebug('Wake heard: ' + heardRaw);
+            if (isWakePhrase(heard)) {
+                if (now - lastWakeTriggerAt < 1200) return; // debounce ~1.2s
+                lastWakeTriggerAt = now;
+                addToConversation('You', heardRaw);
+                // Speak confirmation first, then start focused listening when TTS ends
+                try {
+                    const utter = new SpeechSynthesisUtterance('Yes?');
+                    utter.onend = () => setTimeout(() => startListening(), 50);
+                    suppressTtsCancel = true; // do not cancel this confirmation in startListening
+                    window.speechSynthesis.speak(utter);
+                } catch {
+                    // Fallback if TTS not available
+                    setTimeout(() => startListening(), 150);
+                }
+                return;
+            }
+            // Direct immediate commands like "liya read text"
+            if (heard.startsWith('liya ')) {
+                if (now - lastWakeTriggerAt < 800) return; // slight debounce
+                lastWakeTriggerAt = now;
+                addToConversation('You', heardRaw);
+                processVoiceCommand(heardRaw);
+            }
+        };
+        r.onerror = (e) => {
+            // Handle no-speech and similar transient errors by quick restart
+            // 'aborted' is expected during deliberate restarts; don't log or act on it
+            if (e && e.error === 'aborted') return;
+            console.warn('Wake recognizer error', e);
+            clearWakeWatchdog();
+            if (!wakeActive) return;
+            try { setWakeDebug('Wake error: ' + (e && e.error ? e.error : 'unknown')); } catch {}
+            const transient = (e && (e.error === 'no-speech' || e.error === 'network' || e.error === 'audio-capture'));
+            if (transient) {
+                if (wakeRestarting) return;
+                wakeRestarting = true;
+                try { r.abort && r.abort(); } catch {}
+                setTimeout(() => {
+                    if (!wakeActive) { wakeRestarting = false; return; }
+                    wakeRecognition = createRecognizer();
+                    if (!wakeStarting) {
+                        wakeStarting = true;
+                        try { wakeRecognition.start(); } catch (err) { console.warn('Wake quick-restart failed', err); } finally { /* onstart clears */ }
+                    }
+                    wakeRestarting = false;
+                }, 250);
+            }
+        };
+        r.onend = () => {
+            if (wakeActive) {
+                // Restart to simulate continuous listening
+                clearWakeWatchdog();
+                if (!wakeRestarting && !wakeStarting) {
+                    wakeRestarting = true;
+                    try { wakeRecognition && wakeRecognition.abort && wakeRecognition.abort(); } catch(e) {}
+                    wakeRecognition = createRecognizer();
+                    if (!wakeStarting) {
+                        wakeStarting = true;
+                        try { wakeRecognition.start(); } catch(e) {} finally { /* onstart clears */ }
+                    }
+                    wakeRestarting = false;
+                }
+                setWakeDebug('Wake: restarting…');
+            }
+        };
+        return r;
+    };
+
+    wakeRecognition = createRecognizer();
+    try { if (!wakeStarting) { wakeStarting = true; wakeRecognition.start(); armWakeWatchdog(); } } catch(e) { console.warn('Wake start error', e); }
+}
+
+function stopWakeWord() {
+    wakeActive = false;
+    
+    // Stop any ongoing speech recognition
+    try { 
+        if (wakeRecognition) {
+            // Remove all event listeners to prevent memory leaks
+            wakeRecognition.onresult = null;
+            wakeRecognition.onerror = null;
+            wakeRecognition.onend = null;
+            wakeRecognition.onstart = null;
+            
+            // Stop the recognition if it's running
+            if (wakeRecognition.stop) {
+                wakeRecognition.stop();
+            }
+            
+            // For some browsers, we need to abort as well
+            if (wakeRecognition.abort) {
+                wakeRecognition.abort();
+            }
+            
+            wakeRecognition = null;
+        }
+    } catch(e) {
+        console.warn('Error stopping wake word recognition:', e);
+    }
+    
+    // Clear watchdog and reset guards
+    try { 
+        if (wakeWatchdog) { 
+            clearTimeout(wakeWatchdog); 
+            wakeWatchdog = null; 
+        } 
+    } catch(e) {
+        console.warn('Error clearing wake word watchdog:', e);
+    }
+    
+    wakeRestarting = false;
+    wakeStarting = false;
+    
+    // Update UI
+    const badge = document.getElementById('wakeStatus');
+    if (badge) { 
+        badge.className = 'badge bg-secondary'; 
+        badge.textContent = 'Wake word off'; 
+    }
+    
+    try {
+        const onBtn = document.getElementById('wakeEnableBtn');
+        const offBtn = document.getElementById('wakeDisableBtn');
+        if (onBtn) onBtn.style.display = 'inline-block';
+        if (offBtn) offBtn.style.display = 'none';
+    } catch(e) {
+        console.warn('Error updating UI elements:', e);
+    }
+    
+    try { 
+        const mic = document.getElementById('micBtn'); 
+        if (mic) mic.classList.remove('listening'); 
+    } catch(e) {
+        console.warn('Error updating microphone button:', e);
+    }
+    
+    setWakeDebug('Wake: off');
+}
+
+// Helper: start wake if supported and not already active
+function startWakeIfSupported() {
+    try {
+        if (!wakeActive && (window.SpeechRecognition || window.webkitSpeechRecognition)) {
+            startWakeWord();
+        }
+    } catch (e) { console.warn('startWakeIfSupported failed', e); }
+}
+
+// When global permissions are granted, auto-start wake word
+window.addEventListener('permissions-granted', () => {
+    startWakeIfSupported();
+});
+
+// One-time fallback: on first user interaction, try starting wake word (satisfies gesture requirements)
+const gestureStart = () => {
+    startWakeIfSupported();
+    document.removeEventListener('click', gestureStart);
+    document.removeEventListener('touchstart', gestureStart);
+};
+document.addEventListener('click', gestureStart, { once: true });
+document.addEventListener('touchstart', gestureStart, { once: true });
+
+// Pause when tab hidden; resume when visible
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        if (wakeActive) {
+            try { wakeRecognition && wakeRecognition.stop && wakeRecognition.stop(); } catch(e) {}
+        }
+    } else {
+        // Resume if previously active
+        startWakeIfSupported();
+    }
+});
+
+// Speech synthesis helper
+function speakText(text) {
+    try {
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.rate = 1.0;
+        utter.pitch = 1.0;
+        window.speechSynthesis.speak(utter);
+    } catch (e) {
+        console.warn('Speech synthesis not available', e);
+    }
+}
+
+// Announce wake words on load
+document.addEventListener('DOMContentLoaded', function() {
+    const intro = "Welcome to the voice assistant. Say 'Liya' to wake me, then speak your command. You can also say 'Liya read text' or ask a question.";
+    setTimeout(() => {
+        speakText(intro);
+    }, 2000);
+});
+</script>
+{% endblock %}

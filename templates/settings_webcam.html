@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="refresh" content="0;url=/">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redirecting…</title>
+  <script>window.location.replace('/');</script>
+  <style>
+    body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;display:grid;place-items:center;height:100vh;margin:0;color:#111}
+    .card{padding:24px 28px;border:1px solid rgba(0,0,0,0.08);border-radius:16px;background:#fff;box-shadow:0 10px 30px rgba(0,0,0,0.08)}
+  </style>
+</head>
+<body>
+  <div class="card">This page is deprecated. Redirecting to Home…</div>
+</body>
+</html>
+{% extends "base.html" %}
+
+{% block title %}Voice Assistant - Webcam Settings{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-camera me-2"></i>Webcam Settings</h3>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <h5><i class="fas fa-info-circle me-2"></i>Webcam Integration</h5>
+                    <p>This version automatically detects and uses your local webcam. No IP camera configuration needed!</p>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-primary" onclick="reconnectCamera()">
+                        <i class="fas fa-refresh me-2"></i>Reconnect Webcam
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="testCamera()">
+                        <i class="fas fa-test-tube me-2"></i>Test Camera
+                    </button>
+                </div>
+                
+                <div id="status" class="mt-4"></div>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h3><i class="fas fa-cog me-2"></i>API Configuration</h3>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <h5><i class="fas fa-key me-2"></i>OCR.space API (Optional)</h5>
+                    <p>For better OCR accuracy, you can add an OCR.space API key to your <code>.env</code> file:</p>
+                    <ol>
+                        <li>Get a free API key from <a href="https://ocr.space/ocrapi" target="_blank">ocr.space/ocrapi</a></li>
+                        <li>Add it to your <code>.env</code> file: <code>OCR_SPACE_API_KEY=your_key_here</code></li>
+                        <li>Restart the application</li>
+                    </ol>
+                    <p><small>If no API key is provided, the app will use local Tesseract OCR.</small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="fas fa-camera me-2"></i>Camera Preview</h4>
+            </div>
+            <div class="card-body">
+                <div class="video-container">
+                    <img id="videoFeed" src="/video_feed" alt="Webcam feed">
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h4><i class="fas fa-tools me-2"></i>System Requirements</h4>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check-circle text-success me-2"></i>Python 3.8+</li>
+                    <li><i class="fas fa-check-circle text-success me-2"></i>PyAudio (for microphone)</li>
+                    <li><i class="fas fa-check-circle text-success me-2"></i>OpenCV (for webcam)</li>
+                    <li><i class="fas fa-check-circle text-success me-2"></i>Tesseract OCR</li>
+                    <li><i class="fas fa-check-circle text-success me-2"></i>Hugging Face Transformers</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h4><i class="fas fa-rocket me-2"></i>Quick Actions</h4>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-primary" onclick="speakInstructions()">
+                        <i class="fas fa-volume-up me-1"></i> Hear Instructions
+                    </button>
+                    <button class="btn btn-outline-success" onclick="testVoice()">
+                        <i class="fas fa-microphone me-1"></i> Test Voice
+                    </button>
+                    <a href="/" class="btn btn-outline-info">
+                        <i class="fas fa-home me-1"></i> Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Video feed will auto-load
+});
+
+function reconnectCamera() {
+    showStatus('🔄 Reconnecting to webcam...');
+    
+    makeApiCall('/api/reconnect_camera', {},
+        function(data) {
+            showStatus('✅ Webcam reconnected successfully!');
+        },
+        function(error) {
+            showStatus('❌ Failed to reconnect webcam: ' + error, true);
+        }
+    );
+}
+
+function testCamera() {
+    showStatus('📷 Testing webcam connection...');
+    
+    const videoFeed = document.getElementById('videoFeed');
+    const testImg = new Image();
+    
+    testImg.onload = function() {
+        showStatus('✅ Webcam test successful!');
+    };
+    
+    testImg.onerror = function() {
+        showStatus('❌ Webcam test failed. Please check your webcam connection.', true);
+    };
+    
+    testImg.src = '/video_feed?' + new Date().getTime();
+}
+
+function speakInstructions() {
+    const instructions = `
+        Welcome to the webcam settings page. 
+        This version automatically detects and uses your local webcam - no IP camera setup required. 
+        You can reconnect the webcam if needed, test the camera connection, and configure OCR settings. 
+        For better text recognition accuracy, consider adding an OCR.space API key to your environment file. 
+        Once everything is set up, return to the home page to start using voice commands and text reading features.
+    `;
+    
+    makeApiCall('/api/speak', {text: instructions},
+        function(data) {
+            showStatus('🔊 Instructions spoken');
+        },
+        function(error) {
+            showStatus('Error speaking instructions: ' + error, true);
+        }
+    );
+}
+
+function testVoice() {
+    showStatus('🎤 Testing voice recognition...');
+    
+    makeApiCall('/api/listen', {},
+        function(data) {
+            if (data.text) {
+                showStatus(`✅ Voice test successful! You said: "${data.text}"`);
+                makeApiCall('/api/speak', {text: `I heard you say: ${data.text}`});
+            } else {
+                showStatus('No speech detected during test', true);
+            }
+        },
+        function(error) {
+            showStatus('Voice test failed: ' + error, true);
+        }
+    );
+}
+</script>
+{% endblock %}

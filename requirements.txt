@@ -1,0 +1,11 @@
+flask==2.3.3
+flask-cors==4.0.0
+opencv-python==4.8.1.78
+speechrecognition==3.10.0
+pyttsx3==2.90
+requests==2.31.0
+python-dotenv==1.0.0
+pillow==10.0.1
+pytesseract==0.3.10
+gtts==2.4.0
+numpy==1.24.3

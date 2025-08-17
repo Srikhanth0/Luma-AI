@@ -1,0 +1,31 @@
+{
+  "name": "Liya Voice Assistant",
+  "short_name": "Liya",
+  "description": "Voice assistant with wake word, AI chat, and OCR",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#6d28d9",
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "/static/LUMA.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/LUMA.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/LUMA.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
