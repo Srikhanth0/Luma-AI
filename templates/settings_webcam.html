@@ -120,14 +120,14 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function reconnectCamera() {
-    showStatus('🔄 Reconnecting to webcam...');
+    showStatus('Reconnecting to webcam...');
     
     makeApiCall('/api/reconnect_camera', {},
         function(data) {
-            showStatus('✅ Webcam reconnected successfully!');
+            showStatus('Webcam reconnected successfully!');
         },
         function(error) {
-            showStatus('❌ Failed to reconnect webcam: ' + error, true);
+            showStatus('Failed to reconnect webcam: ' + error, true);
         }
     );
 }
@@ -139,11 +139,11 @@ function testCamera() {
     const testImg = new Image();
     
     testImg.onload = function() {
-        showStatus('✅ Webcam test successful!');
+        showStatus('Webcam test successful!');
     };
     
     testImg.onerror = function() {
-        showStatus('❌ Webcam test failed. Please check your webcam connection.', true);
+        showStatus('Webcam test failed. Please check your webcam connection.', true);
     };
     
     testImg.src = '/video_feed?' + new Date().getTime();
@@ -174,7 +174,7 @@ function testVoice() {
     makeApiCall('/api/listen', {},
         function(data) {
             if (data.text) {
-                showStatus(`✅ Voice test successful! You said: "${data.text}"`);
+                showStatus(`Voice test successful! You said: "${data.text}"`);
                 makeApiCall('/api/speak', {text: `I heard you say: ${data.text}`});
             } else {
                 showStatus('No speech detected during test', true);
