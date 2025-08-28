@@ -12,11 +12,11 @@
   [![Accessibility](https://img.shields.io/badge/Accessibility-WCAG%202.1-purple.svg)](https://www.w3.org/WAI/WCAG21/quickref/)
 </div>
 
-## 🌟 Overview
+##  Overview
 
 LUMA is a comprehensive voice assistant web application specifically designed for visually impaired users. It combines cutting-edge AI technology with accessibility-first design to provide voice interaction, camera integration, OCR text reading, and intelligent question answering.
 
-## ✨ Features
+## Features
 
 ### **Advanced Voice Interface**
 - **Multi-Engine Speech Recognition**: Google Speech API with fallback support
@@ -47,7 +47,7 @@ LUMA is a comprehensive voice assistant web application specifically designed fo
 - **Screen Reader Compatible**: ARIA labels and semantic HTML
 - **Responsive Design**: Works on all devices
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### Prerequisites
 - Python 3.8+
@@ -92,7 +92,7 @@ LUMA is a comprehensive voice assistant web application specifically designed fo
    # Access at http://localhost:5001
    ```
 
-## 🎯 Usage Guide
+##  Usage Guide
 
 ### Voice Commands
 - **"Hey Liya"** - Wake word activation
@@ -217,11 +217,11 @@ The web version (`app_lite.py`) includes:
 - Verify API keys in `.env`
 - Check text clarity and size
 
-## 📄 License
+##  License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+##  Acknowledgments
 
 - Built with accessibility in mind for the visually impaired community
 - Powered by Google Gemini AI and OCR.space
